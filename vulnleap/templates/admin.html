@@ -20,9 +20,17 @@
                     <td>{{ user_roles[u.id] }}</td>
                     <td>
                         {% if u.id != user.id %}
-                            <form method="POST" action="{{ url_for('main.remove_user', user_id=u.id) }}" style="display: inline;" onsubmit="return confirm('Are you sure you want to remove user {{ u.username }}? This action cannot be undone.')">
-                                <button type="submit" class="btn btn-danger btn-sm">Remove</button>
-                            </form>
+                            {% if user.user_type == 'superadmin' %}
+                                <form method="POST" action="{{ url_for('main.remove_user', user_id=u.id) }}" style="display: inline;" onsubmit="return confirm('Are you sure you want to remove user {{ u.username }}? This action cannot be undone.')">
+                                    <button type="submit" class="btn btn-danger btn-sm">Remove</button>
+                                </form>
+                            {% elif user.user_type == 'admin' and u.user_type != 'superadmin' %}
+                                <form method="POST" action="{{ url_for('main.remove_user', user_id=u.id) }}" style="display: inline;" onsubmit="return confirm('Are you sure you want to remove user {{ u.username }}? This action cannot be undone.')">
+                                    <button type="submit" class="btn btn-danger btn-sm">Remove</button>
+                                </form>
+                            {% else %}
+                                <span class="text-muted">Insufficient permissions</span>
+                            {% endif %}
                         {% else %}
                             <span class="text-muted">Cannot remove yourself</span>
                         {% endif %}
