@@ -253,11 +253,18 @@ def quote_page(quote_id):
     user = User.query.get(session['user_id'])
     if not user:
         flash("User not found.", "danger")
+        return redirect(url_for('main.login'))
 
     quote = MortgageQuote.query.get(quote_id)
     if not quote:
         flash("Quote not found.", "danger")
         return redirect(url_for('main.user'))
+    
+    # Check if the quote belongs to the current user (IDOR protection)
+    if quote.user_id != session['user_id']:
+        flash("You do not have permission to view this quote.", "danger")
+        return redirect(url_for('main.user'))
+    
     return render_template('existing_quote.html', quote=quote)
 
 @main.route('/admin')
